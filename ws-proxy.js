@@ -1,21 +1,29 @@
 const fs = require('fs');
+const yaml = require('js-yaml');
 const http = require('http');
 const webSocket = require('ws');
 const child_process = require('child_process');
-const yaml = require('js-yaml');
 
 let cameras = {};
 
 try {
-    cameras = yaml.safeLoad(fs.readFileSync('streams.yml', 'utf8'));
+    cameras = yaml.safeLoad(fs.readFileSync('/etc/rtsp-ws-proxy/streams.yml', 'utf8'));
 } catch (e) {
-    console.log(e);
+    try {
+        cameras = yaml.safeLoad(fs.readFileSync('streams.yml', 'utf8'));
+    } catch (e) {
+        try {
+            cameras = yaml.safeLoad(fs.readFileSync(process.argv[2], 'utf8'));
+        } catch (e) {
+            console.log(e);
+        }
+    }
 }
 
 const maxCamerasMaxPortNum = function () {
     let ports = [];
     for (const camera in cameras) {
-        ports.push(cameras[camera].port);
+        ports.push(cameras[camera].wsPort);
     }
     return Math.max.apply(null, ports);
 };
@@ -23,7 +31,7 @@ const maxCamerasMaxPortNum = function () {
 
 let i = 1;
 for (const camera in cameras) {
-    const wsPort = cameras[camera].port;
+    const wsPort = cameras[camera].wsPort;
     const port = maxCamerasMaxPortNum() + i;
     initSocketServer(new webSocket.Server({port: wsPort, perMessageDeflate: false}), port);
     start_ffmpeg(cameras[camera].stream, port);
@@ -87,9 +95,9 @@ function start_ffmpeg(path, port) {
         '-bf', '0',
         '-r', '25',
         'http://localhost:' + port
-    ], (error, stdout, stderr) => {
+    ], (error, stdout) => {
         if (error) {
-            throw error;
+            console.error(error);
         }
         console.log(stdout);
     });
