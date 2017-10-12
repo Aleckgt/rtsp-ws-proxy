@@ -1,6 +1,6 @@
 camera1:
   stream: rtsp://b1.dnsdojo.com:1935/live/sys3.stream
-  port: 8081
+  wsPort: 8081
 camera2:
   stream: rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
-  port: 8082
+  wsPort: 8082
