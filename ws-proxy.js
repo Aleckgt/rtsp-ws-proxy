@@ -26,7 +26,7 @@ for (const camera in cameras) {
     const wsPort = cameras[camera].port;
     const port = maxCamerasMaxPortNum() + i;
     initSocketServer(new webSocket.Server({port: wsPort, perMessageDeflate: false}), port);
-    ffmpeg(cameras[camera].stream, port);
+    start_ffmpeg(cameras[camera].stream, port);
     i++;
 }
 
@@ -77,13 +77,20 @@ function initSocketServer(socketServer, port) {
     }).listen(port);
 }
 
-function ffmpeg(path, port) {
-    child_process.spawn('ffmpeg', [
+function start_ffmpeg(path, port) {
+    ffmpeg = child_process.execFile('ffmpeg', [
         '-rtsp_transport', 'tcp',
         '-i', path,
         '-codec:v', 'mpeg1video',
         '-f', 'mpegts',
+        '-b:v', '5000k',
+        '-bf', '0',
         '-r', '25',
         'http://localhost:' + port
-    ]);
+    ], (error, stdout, stderr) => {
+        if (error) {
+            throw error;
+        }
+        console.log(stdout);
+    });
 }
