@@ -85,12 +85,16 @@ function initSocketServer(socketServer, port) {
 }
 
 function start_ffmpeg(path, port) {
-    const command = (path, port) => {
-        return 'ffmpeg -rtsp_transport tcp -i ' + path +
-            ' -codec:v mpeg1video -f mpegts -b:v 5000k -bf 0 -r 25 http://localhost:' + port;
-    };
-    ffmpeg = child_process.exec(command(path, port),
-        {maxBuffer: 1024 * 500}, (error, stdout) => {
+    ffmpeg = child_process.execFile('ffmpeg', [
+        '-rtsp_transport', 'tcp',
+        '-i', path,
+        '-codec:v', 'mpeg1video',
+        '-f', 'mpegts',
+        '-b:v', '5000k',
+        '-bf', '0',
+        '-r', '25',
+        'http://localhost:' + port
+    ], {MaxBuffer: 500 * 1024}, (error, stdout) => {
         if (error) {
             console.error(error);
         }
