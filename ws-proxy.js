@@ -20,14 +20,13 @@ try {
     }
 }
 
-const maxCamerasMaxPortNum = function () {
+const maxCamerasMaxPortNum = () => {
     let ports = [];
     for (const camera in cameras) {
         ports.push(cameras[camera].wsPort);
     }
     return Math.max.apply(null, ports);
 };
-
 
 let i = 1;
 for (const camera in cameras) {
@@ -40,7 +39,7 @@ for (const camera in cameras) {
 
 function initSocketServer(socketServer, port) {
     socketServer.connectionCount = 0;
-    socketServer.on('connection', function (socket, upgradeReq) {
+    socketServer.on('connection', (socket, upgradeReq) => {
         socketServer.connectionCount++;
         console.log(
             'New WebSocket Connection: ',
@@ -48,14 +47,14 @@ function initSocketServer(socketServer, port) {
             (upgradeReq || socket.upgradeReq).headers['user-agent'],
             '(' + socketServer.connectionCount + ' total)'
         );
-        socket.on('close', function () {
+        socket.on('close', () => {
             socketServer.connectionCount--;
             console.log(
                 'Disconnected WebSocket (' + socketServer.connectionCount + ' total)'
             );
         });
     });
-    socketServer.broadcast = function (data) {
+    socketServer.broadcast = (data) => {
         socketServer.clients.forEach(function each(client) {
             if (client.readyState === webSocket.OPEN) {
                 client.send(data);
@@ -63,20 +62,20 @@ function initSocketServer(socketServer, port) {
         });
     };
 
-    const streamServer = http.createServer(function (request, response) {
+    const streamServer = http.createServer((request, response) => {
         response.connection.setTimeout(0);
         console.log(
             'Stream Connected: ' +
             request.socket.remoteAddress + ':' +
             request.socket.remotePort
         );
-        request.on('data', function (data) {
+        request.on('data', (data) => {
             socketServer.broadcast(data);
             if (request.socket.recording) {
                 request.socket.recording.write(data);
             }
         });
-        request.on('end', function () {
+        request.on('end', () => {
             console.log('close');
             if (request.socket.recording) {
                 request.socket.recording.close();
@@ -86,16 +85,12 @@ function initSocketServer(socketServer, port) {
 }
 
 function start_ffmpeg(path, port) {
-    ffmpeg = child_process.execFile('ffmpeg', [
-        '-rtsp_transport', 'tcp',
-        '-i', path,
-        '-codec:v', 'mpeg1video',
-        '-f', 'mpegts',
-        '-b:v', '5000k',
-        '-bf', '0',
-        '-r', '25',
-        'http://localhost:' + port
-    ], (error, stdout) => {
+    const command = (path, port) => {
+        return 'ffmpeg -rtsp_transport tcp -i ' + path +
+            ' -codec:v mpeg1video -f mpegts -b:v 5000k -bf 0 -r 25 http://localhost:' + port;
+    };
+    ffmpeg = child_process.exec(command(path, port),
+        {maxBuffer: 1024 * 500}, (error, stdout) => {
         if (error) {
             console.error(error);
         }
