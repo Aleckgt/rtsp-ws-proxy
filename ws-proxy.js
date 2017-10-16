@@ -4,6 +4,7 @@ const http = require('http');
 const webSocket = require('ws');
 const child_process = require('child_process');
 
+let child_processes = [];
 let cameras = {};
 
 try {
@@ -19,6 +20,11 @@ try {
         }
     }
 }
+
+process.on('SIGINT', () => {
+    child_processes.forEach((child) => child.kill());
+    process.exit(0);
+});
 
 const maxCamerasMaxPortNum = () => {
     let ports = [];
@@ -85,7 +91,7 @@ function initSocketServer(socketServer, port) {
 }
 
 function start_ffmpeg(path, port) {
-    ffmpeg = child_process.execFile('ffmpeg', [
+    ffmpeg = child_process.spawn('ffmpeg', [
         '-rtsp_transport', 'tcp',
         '-i', path,
         '-codec:v', 'mpeg1video',
@@ -94,10 +100,19 @@ function start_ffmpeg(path, port) {
         '-bf', '0',
         '-r', '25',
         'http://localhost:' + port
-    ], {MaxBuffer: 500 * 1024}, (error, stdout) => {
+    ], {
+        detached: true,
+        shell: true,
+        stdio: 'ignore'
+    }, (error, stdout) => {
         if (error) {
             console.error(error);
         }
         console.log(stdout);
     });
+
+    child_processes.push(ffmpeg);
+    console.log('[' + ffmpeg.pid + '] ' + ffmpeg.spawnargs);
+
+    ffmpeg.on('exit', (code) => console.log('child process exited with code ' + code));
 }
