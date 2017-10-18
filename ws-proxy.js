@@ -4,8 +4,10 @@ const http = require('http');
 const webSocket = require('ws');
 const child_process = require('child_process');
 
-let child_processes = [];
+let child_processes = new Map();
 let cameras = {};
+
+const argNum =  /^win/.test(process.platform) ? 3 : 2;
 
 try {
     cameras = yaml.safeLoad(fs.readFileSync('/etc/rtsp-ws-proxy/streams.yml', 'utf8'));
@@ -22,7 +24,9 @@ try {
 }
 
 process.on('SIGINT', () => {
-    child_processes.forEach((child) => child.kill());
+    for(let child of child_processes.keys()) {
+        process.kill(-child);
+    }
     process.exit(0);
 });
 
@@ -32,6 +36,40 @@ const maxCamerasMaxPortNum = () => {
         ports.push(cameras[camera].wsPort);
     }
     return Math.max.apply(null, ports);
+};
+
+const start_ffmpeg = (path, port) => {
+   const ffmpeg = child_process.spawn('ffmpeg', [
+        '-rtsp_transport', 'tcp',
+        '-i', path,
+        '-codec:v', 'mpeg1video',
+        '-f', 'mpegts',
+        '-b:v', '5000k',
+        '-bf', '0',
+        '-r', '25',
+        'http://localhost:' + port
+    ], {
+        detached: true,
+        shell: true,
+        stdio: 'ignore'
+    }, (error) => {
+        if (error) {
+            console.error(error);
+            this.kill();
+            child_processes.delete(this.pid);
+            start_ffmpeg(path, port);
+        }
+    });
+
+   ffmpeg.on('close', (code) => {
+       console.log('Process ' + ffmpeg.pid + ' exit with code: ' + code + '. Restart ffmpeg.');
+       child_processes.delete(ffmpeg.pid);
+       let args = ffmpeg.spawnargs[argNum];
+       start_ffmpeg(args.match(/(rtsp:.+?)\s/i)[1], args.match(/http:.+:(\d{4})/)[1]);
+   });
+
+    child_processes.set(ffmpeg.pid, ffmpeg);
+    console.log('[' + ffmpeg.pid + '] ' + ffmpeg.spawnargs[argNum]);
 };
 
 let i = 1;
@@ -88,31 +126,4 @@ function initSocketServer(socketServer, port) {
             }
         });
     }).listen(port);
-}
-
-function start_ffmpeg(path, port) {
-    ffmpeg = child_process.spawn('ffmpeg', [
-        '-rtsp_transport', 'tcp',
-        '-i', path,
-        '-codec:v', 'mpeg1video',
-        '-f', 'mpegts',
-        '-b:v', '5000k',
-        '-bf', '0',
-        '-r', '25',
-        'http://localhost:' + port
-    ], {
-        detached: true,
-        shell: true,
-        stdio: 'ignore'
-    }, (error, stdout) => {
-        if (error) {
-            console.error(error);
-        }
-        console.log(stdout);
-    });
-
-    child_processes.push(ffmpeg);
-    console.log('[' + ffmpeg.pid + '] ' + ffmpeg.spawnargs);
-
-    ffmpeg.on('exit', (code) => console.log('child process exited with code ' + code));
 }
