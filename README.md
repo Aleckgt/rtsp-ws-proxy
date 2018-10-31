@@ -1,9 +1,7 @@
-First of all: sorry for my english...
-
 # rtsp-ws-proxy 
 rtsp-ws-proxy allows to transfer rtsp-stream from ip-camera to a web browser via websockets. The output video stream is broadcast in the MPEG1 video-format (the audio decoding not implemented. You can add audio-decoding options if it needed). For decoding input rtsp-stream using ffmpeg (https://www.ffmpeg.org/). 
 
-## Usage:
+### Usage:
   1) copy streams.yml into /etc/rtsp-ws-proxy/
   2) fill streams.yml like this
   ```yaml
