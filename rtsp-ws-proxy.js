@@ -24,7 +24,7 @@ try {
 }
 
 process.on('SIGINT', () => {
-    for(let child of child_processes.keys()) {
+    for (let child of child_processes.keys()) {
         process.kill(-child);
     }
     process.exit(0);
@@ -38,15 +38,20 @@ const maxCamerasMaxPortNum = () => {
     return Math.max.apply(null, ports);
 };
 
-const start_ffmpeg = (path, port) => {
-   const ffmpeg = child_process.spawn('ffmpeg', [
-        '-rtsp_transport', 'tcp',
+const start_ffmpeg = (path, port, protocol) => {
+    const ffmpeg = child_process.spawn('ffmpeg', [
+        '-rtsp_transport', protocol,
         '-i', path,
-        '-codec:v', 'mpeg1video',
+        '-c:v', 'mpeg1video',
         '-f', 'mpegts',
         '-b:v', '5000k',
-        '-bf', '0',
+        //'-pre', 'ultrafast',
+        '-tune', 'zerolatency',
+        '-pix_fmt', 'yuv420p',
         '-r', '25',
+        '-an',
+        '-dn',
+        '-sn',
         'http://localhost:' + port
     ], {
         detached: true,
@@ -57,16 +62,18 @@ const start_ffmpeg = (path, port) => {
             console.error(error);
             this.kill();
             child_processes.delete(this.pid);
-            start_ffmpeg(path, port);
+            console.log('Restarting ffmpeg');
+            start_ffmpeg(path, port, protocol);
         }
     });
 
-   ffmpeg.on('close', (code) => {
-       console.log('Process ' + ffmpeg.pid + ' exit with code: ' + code + '. Restart ffmpeg.');
-       child_processes.delete(ffmpeg.pid);
-       let args = ffmpeg.spawnargs[argNum];
-       start_ffmpeg(args.match(/(rtsp:.+?)\s/i)[1], args.match(/http:.+:(\d{4})/)[1]);
-   });
+    ffmpeg.on('close', (code) => {
+        console.log('Process ' + ffmpeg.pid + ' exit with code: ' + code + '. Restarting ffmpeg.');
+        child_processes.delete(ffmpeg.pid);
+        let args = ffmpeg.spawnargs[argNum];
+        start_ffmpeg(args.match(/(rtsp:.+?)\s/i)[1], args.match(/http:.+:(\d{4})/)[1], args.match(/-rtsp_transport\s(tcp|udp)\s/i)[1]);
+    });
+
 
     child_processes.set(ffmpeg.pid, ffmpeg);
     console.log('[' + ffmpeg.pid + '] ' + ffmpeg.spawnargs[argNum]);
@@ -74,10 +81,9 @@ const start_ffmpeg = (path, port) => {
 
 let i = 1;
 for (const camera in cameras) {
-    const wsPort = cameras[camera].wsPort;
     const port = maxCamerasMaxPortNum() + i;
-    initSocketServer(new webSocket.Server({port: wsPort, perMessageDeflate: false}), port);
-    start_ffmpeg(cameras[camera].stream, port);
+    initSocketServer(new webSocket.Server({port: cameras[camera].wsPort, perMessageDeflate: false}), port);
+    start_ffmpeg(cameras[camera].stream, port, cameras[camera].protocol);
     i++;
 }
 
@@ -125,5 +131,5 @@ function initSocketServer(socketServer, port) {
                 request.socket.recording.close();
             }
         });
-    }).listen(port);
+    }).listen(port, '127.0.0.1');
 }

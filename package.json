@@ -1,7 +1,7 @@
 {
   "name": "rtsp-ws-proxy",
   "version": "1.0.0",
-  "description": "Multi rtsp-stream ws proxy",
+  "description": "Multistream rtsp via ws proxy",
   "main": "ws-proxy.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,7 +9,8 @@
   "author": "Alexey Kokov",
   "license": "ISC",
   "dependencies": {
-    "node-yaml": "^3.1.1",
-    "ws": "^3.2.0"
+    "node-yaml": "^3.2.0",
+    "ws": "^6.2.1",
+    "pkg": "^4.3.7"
   }
 }
