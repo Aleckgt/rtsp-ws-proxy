@@ -8,9 +8,11 @@ rtsp-ws-proxy allows to transfer rtsp-stream from ip-camera to a web browser via
     camera1:
       stream: rtsp://b1.dnsdojo.com:1935/live/sys3.stream
       wsPort: 8081
+      protocol: tcp
     camera2:
       stream: rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
       wsPort: 8082
+      protocol: udp
       ...
   ```
   3) start ws-proxy.js via node.js or start ws-linux-linux
