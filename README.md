@@ -1,5 +1,5 @@
 # rtsp-ws-proxy 
-rtsp-ws-proxy allows to transfer rtsp-stream from ip-camera to a web browser via websockets. The output video stream is broadcast in the MPEG1 video-format (the audio decoding not implemented. You can add audio-decoding options if it needed). For decoding input rtsp-stream using ffmpeg (https://www.ffmpeg.org/). 
+rtsp-ws-proxy allows to transfer rtsp-stream from ip-camera to a web browser via websockets. The output video stream is broadcast in the MPEG1 video-format (the audio decoding not implemented. You can add audio-decoding options if it needed). ffmeg is used to decode the input rtsp-stream (https://www.ffmpeg.org/). 
 
 ### Usage:
   1) copy streams.yml into /etc/rtsp-ws-proxy/
@@ -15,8 +15,8 @@ rtsp-ws-proxy allows to transfer rtsp-stream from ip-camera to a web browser via
       protocol: udp
       ...
   ```
-  3) start ws-proxy.js via node.js or start ws-linux-linux
-  4) on web page use [jsmpeg.js](https://github.com/phoboslab/jsmpeg) or similar.
+  3) start ws-proxy.js via node.js or start rtsp-ws-proxy
+  4) on web page you can use [jsmpeg.js](https://github.com/phoboslab/jsmpeg) or similar.
   
   Example with jsmpeg
   ```html
