@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+    <script type="text/javascript" src="jsmpeg.min.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        var canvas = document.getElementById('video-player');
+        new JSMpeg.Player(canvas.getAttribute('video-stream'), {canvas: canvas});
+    });
+</script>
+<div>
+    <canvas id="video-player" video-stream="ws://localhost:8081" style="width:1280px; height:720px;"></canvas>
+</div>
+</body>
+</html>
