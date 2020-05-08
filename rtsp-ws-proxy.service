@@ -1,0 +1,13 @@
+[Unit]
+Description=%{summary}
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/rtsp-ws-proxy
+ExecStart=/opt/rtsp-ws-proxy/rtsp-ws-proxy
+PIDFile=/var/run/rtsp-ws-proxy.pid
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
