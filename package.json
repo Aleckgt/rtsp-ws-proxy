@@ -19,7 +19,7 @@
     "webpack-cli": "3.3.11"
   },
   "scripts": {
-    "start": "node ./src/rtsp-ws-proxy.js",
+    "start": "node ./src/rtsp-ws-proxy.js ./config/streams.yml",
     "watch": "webpack --watch -d",
     "test": "echo 'Error: no test specified' && exit 0",
     "build": "rm -rf ./dist/rtsp-ws-proxy && pkg -t node12-linux -o ./dist/rtsp-ws-proxy ./src/rtsp-ws-proxy.js"
