@@ -3,7 +3,7 @@
   "repository": {
     "url": "git@github.com:Aleckgt/rtsp-ws-proxy.git"
   },
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Multistream rtsp via ws proxy",
   "main": "ws-proxy.js",
   "author": "Alexey Kokov",
