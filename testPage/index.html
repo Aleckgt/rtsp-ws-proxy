@@ -7,13 +7,18 @@
 </head>
 <body>
 <script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function () {
-        var canvas = document.getElementById('video-player');
-        new JSMpeg.Player(canvas.getAttribute('video-stream'), {canvas: canvas});
+    document.addEventListener("DOMContentLoaded", () => {
+        const canvas1 = document.getElementById('video-player-1');
+        new JSMpeg.Player(canvas1.getAttribute('video-stream'), {canvas: canvas1});
+        const canvas2 = document.getElementById('video-player-2');
+        new JSMpeg.Player(canvas2.getAttribute('video-stream'), {canvas: canvas2});
     });
 </script>
-<div>
-    <canvas id="video-player" video-stream="ws://localhost:8081" style="width:1280px; height:720px;"></canvas>
+<div style="display: inline;">
+    <canvas id="video-player-1" video-stream="ws://localhost:8081" style="width:640px; height:480px;"/>
+</div>
+<div style="display: inline;">
+    <canvas id="video-player-2" video-stream="ws://localhost:8082" style="width:640px; height:480px;"/>
 </div>
 </body>
 </html>

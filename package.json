@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "js-yaml": "3.13.1",
+    "logger-nodejs": "1.1.0",
     "node-yaml": "4.0.1",
     "ws": "7.2.5"
   },
