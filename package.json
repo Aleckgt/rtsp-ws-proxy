@@ -1,28 +1,44 @@
 {
   "name": "rtsp-ws-proxy",
   "repository": {
+    "type": "git",
     "url": "git@github.com:Aleckgt/rtsp-ws-proxy.git"
   },
   "version": "2.0.0",
   "description": "Multistream rtsp via ws proxy",
-  "main": "ws-proxy.js",
+  "main": "./build/rtsp-ws-proxy.js",
+  "bin": {
+    "rtsp-ws-proxy": "./build/rtsp-ws-proxy.js"
+  },
   "author": "Alexey Kokov",
   "license": "ISC",
+  "engines": {
+    "node": ">=6"
+  },
   "dependencies": {
     "js-yaml": "3.13.1",
-    "logger-nodejs": "1.1.0",
-    "node-yaml": "4.0.1",
-    "ws": "7.2.5"
+    "ws": "7.3.0"
   },
   "devDependencies": {
-    "webpack": "4.43.0",
-    "webpack-cli": "3.3.11",
-    "pkg": "4.4.8"
+    "@types/js-yaml": "3.12.3",
+    "@types/log4js": "2.3.5",
+    "@types/node": "14.0.1",
+    "@types/ws": "7.2.4",
+    "pkg": "4.4.8",
+    "ts-node": "8.10.1",
+    "tslint": "6.1.2",
+    "typescript": "3.9.2"
+  },
+  "pkg": {
+    "scripts": "build/*.js",
+    "targets": ["node14-linux-x64"]
   },
   "scripts": {
-    "start": "node ./src/rtsp-ws-proxy.js ./config/streams.yml",
-    "watch": "webpack --watch -d",
+    "lint": "tslint src/**/*.ts --fix",
+    "build": "rm -r ./build/** && tsc --declaration",
+    "start": "node build/rtsp-ws-proxy.js config/streams.yml",
     "test": "echo 'Error: no test specified' && exit 0",
-    "build": "rm -rf ./dist/rtsp-ws-proxy && pkg -t node12-linux -o ./dist/rtsp-ws-proxy ./src/rtsp-ws-proxy.js"
+    "dist": "rm -rf ./dist/rtsp-ws-proxy && pkg . --output ./dist/rtsp-ws-proxy --debug",
+    "check": "tslint -p tsconfig.json"
   }
 }

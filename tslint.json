@@ -1,0 +1,16 @@
+{
+    "linterOptions": {
+        "exclude": [
+            "/node_modules/**/*"
+        ]
+    },
+    "rules": {
+        "quotemark": [
+            true,
+            "single"
+        ],
+        "semicolon": [
+            true
+        ]
+    }
+}
