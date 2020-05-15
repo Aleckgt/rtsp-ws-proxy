@@ -5,14 +5,20 @@ rtsp-ws-proxy allows to transfer rtsp-stream from ip-camera to a web browser via
   1) copy streams.yml into /etc/rtsp-ws-proxy/
   2) fill streams.yml like this
   ```yaml
-    camera1:
-      stream: rtsp://b1.dnsdojo.com:1935/live/sys3.stream
-      wsPort: 8081
-      protocol: tcp
-    camera2:
-      stream: rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
-      wsPort: 8082
-      protocol: udp
+  server: 
+    port: 8080
+  cameras:
+  - name: camera1
+    stream: rtsp://91.191.213.49:554/live_mpeg4.sdp
+    wsPort: 8081
+    protocol: tcp               #optional. Default: tcp
+    fps: 25                     #optional. Default: 25
+    bitrate: 5000k              #optional. If does not set, parametr not usung.
+  - name: camera2
+    stream: rtsp://195.46.114.132/live/ch00_0
+    wsPort: 8082
+    protocol: udp
+    fps: 20
       ...
   ```
   3) start ws-proxy.js via node.js or start rtsp-ws-proxy
