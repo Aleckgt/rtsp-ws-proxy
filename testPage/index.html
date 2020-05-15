@@ -1,24 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Test</title>
     <script type="text/javascript" src="jsmpeg.min.js"></script>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", () => {
+            new JSMpeg.Player('ws://localhost:8081', { canvas: document.getElementById('video-player-1') });
+            new JSMpeg.Player('ws://localhost:8082', { canvas: document.getElementById('video-player-2') });
+            new JSMpeg.Player('ws://localhost:8083', { canvas: document.getElementById('video-player-3') });
+            new JSMpeg.Player('ws://localhost:8084', { canvas: document.getElementById('video-player-4') });
+        });
+    </script>
+    <style>
+        canvas {
+            width: 640px;
+            height: 480px;
+        }
+    </style>
 </head>
+
 <body>
-<script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", () => {
-        const canvas1 = document.getElementById('video-player-1');
-        new JSMpeg.Player(canvas1.getAttribute('video-stream'), {canvas: canvas1});
-        const canvas2 = document.getElementById('video-player-2');
-        new JSMpeg.Player(canvas2.getAttribute('video-stream'), {canvas: canvas2});
-    });
-</script>
-<div style="display: inline;">
-    <canvas id="video-player-1" video-stream="ws://localhost:8081" style="width:640px; height:480px;"/>
-</div>
-<div style="display: inline;">
-    <canvas id="video-player-2" video-stream="ws://localhost:8082" style="width:640px; height:480px;"/>
-</div>
+    <canvas id="video-player-1"></canvas>
+    <canvas id="video-player-2"></canvas>
+    <canvas id="video-player-3"></canvas>
+    <canvas id="video-player-4"></canvas>
 </body>
+
 </html>
