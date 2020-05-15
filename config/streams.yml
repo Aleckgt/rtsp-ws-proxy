@@ -1,7 +1,6 @@
 server: 
   port: 8090
 cameras:
-  ppero:
 - name: camera1
   stream: rtsp://91.191.213.49:554/live_mpeg4.sdp
   wsPort: 8081
