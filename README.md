@@ -21,7 +21,7 @@ rtsp-ws-proxy allows to transfer rtsp-stream from ip-camera to a web browser via
     fps: 20
       ...
   ```
-  3) start ws-proxy.js via node.js or start rtsp-ws-proxy
+  3) start rtsp-ws-proxy.js via node.js or start rtsp-ws-proxy
   4) on web page you can use [jsmpeg.js](https://github.com/phoboslab/jsmpeg) or similar.
   
   Example with jsmpeg
