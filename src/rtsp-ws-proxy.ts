@@ -29,7 +29,7 @@ server.setTimeout(28800000, () => {
 
 settings.cameras().forEach((it: any) => {
     createWsServer(it.wsPort, server);
-    ffmpeg.startProcess(settings.serverPort(), it.stream, it.protocol, it.name);
+    ffmpeg.startProcess(settings.serverPort(), it);
 });
 
 function createWsServer(wsPort: number, httpServer: Server) {

@@ -1,21 +1,27 @@
 import { readFileSync } from 'fs';
-import { safeLoad } from 'js-yaml';
+import { safeLoad, YAMLException } from 'js-yaml';
 import * as logger from './logger';
 
 class Settings {
     data: any;
 
     constructor() {
+        let buffer: string = '';
         try {
-            this.data = safeLoad(readFileSync('/etc/rtsp-ws-proxy/streams.yml', 'utf8'));
+            buffer = readFileSync('/etc/rtsp-ws-proxy/streams.yml', 'utf8');
         } catch (e) {
             try {
-                this.data = safeLoad(readFileSync('./streams.yml', 'utf8'));
+                buffer = readFileSync('./streams.yml', 'utf8');
             } catch (e) {
                 try {
-                    this.data = safeLoad(readFileSync(process.argv[2], 'utf8'));
+                    buffer = readFileSync(process.argv[2], 'utf8');
+                    this.data = safeLoad(buffer);
                 } catch (e) {
-                    logger.error('Not found \"streams.yaml\"');
+                    if (e instanceof YAMLException) {
+                        logger.error(`Parse error of \"streams.yml\":\n ${e.message}`);
+                    } else {
+                        logger.error('Not found \"streams.yaml\"');
+                    }
                     process.exit(1);
                 }
             }

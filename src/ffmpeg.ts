@@ -12,19 +12,17 @@ process.on('SIGINT', () => {
     process.exit(0);
 });
 
-export const startProcess = (serverPort: Number, rtspPath: string, protocol: string, cameraName: string) => {
+export const startProcess = (serverPort: number, camera: any) => {
     const ffmpeg = spawn('ffmpeg', [
-        '-rtsp_transport', protocol ? protocol : 'tcp',
-        '-i', rtspPath,
-        '-c:v', 'mpeg1video',
-        '-f', 'mpegts',
-        '-b:v', '5000k',
-        '-bf', '0',
-        '-r', '25',
-        '-an',
-        '-dn',
-        '-sn',
-        `http://localhost:${serverPort}/${cameraName}`
+        '-stimeout 10000000',
+        `-rtsp_transport ${camera.protocol ? camera.protocol : 'tcp'}`,
+        `-i ${camera.stream}`,
+        '-c:v mpeg1video',
+        '-f mpegts',
+        camera.bitrate && `-b:v ${camera.bitrate}`,
+        `-r ${camera.fps ? camera.fps : 25}`,
+        '-an -sn -dn',
+        `http://localhost:${serverPort}/${camera.name}`
     ], {
         shell: true,
         detached: true,
@@ -38,7 +36,7 @@ export const startProcess = (serverPort: Number, rtspPath: string, protocol: str
         processes.delete(ffmpeg.pid);
         if (code === 0) {
             logger.info(`ffmpeg [${ffmpeg.pid}] exit with code: ${code}. Restarting ffmpeg.`);
-            setTimeout(() => startProcess(serverPort, rtspPath, protocol, cameraName), 1000);
+            setTimeout(() => startProcess(serverPort, camera), 1000);
         } else {
             logger.error(`ffmpeg [${ffmpeg.pid}] exit with code: ${code}`);
             errorAction();
@@ -54,6 +52,6 @@ export const startProcess = (serverPort: Number, rtspPath: string, protocol: str
         ffmpeg.kill();
         processes.delete(ffmpeg.pid);
         logger.warn('Restarting ffmpeg');
-        setTimeout(() => startProcess(serverPort, rtspPath, protocol, cameraName), 3000);
+        setTimeout(() => startProcess(serverPort, camera), 3000);
     };
 };
