@@ -6,14 +6,12 @@ import Settings from './settings';
 import * as ffmpeg from './ffmpeg';
 import { Socket } from 'net';
 
-const settings = new Settings();
-
 const wsServers = new Map();
 
 const server = createServer(req => {
-    const wsServer = wsServers.get(settings.cameras().find((it: { name: string; }) => req && req.url && it.name === req.url.substring(1)).wsPort);
+    const wsServer = wsServers.get(Settings.cameras().find((it: { name: string; }) => req && req.url && it.name === req.url.substring(1)).wsPort);
     req.on('data', data => {
-        wsServer && wsServer.clients.forEach((client: { readyState: any; send: (arg0: any) => void; }) => {
+        wsServer && wsServer.clients.forEach((client: any) => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(data);
             }
@@ -22,14 +20,14 @@ const server = createServer(req => {
     req.on('close', () => {
         logger.info('connection closed');
     });
-}).listen(settings.serverPort(), '127.0.0.1');
+}).listen(Settings.serverPort(), '127.0.0.1');
 server.setTimeout(28800000, () => {
 
 });
 
-settings.cameras().forEach((it: any) => {
+Settings.cameras().forEach((it: any) => {
     createWsServer(it.wsPort, server);
-    ffmpeg.startProcess(settings.serverPort(), it);
+    ffmpeg.startProcess(Settings.serverPort(), it);
 });
 
 function createWsServer(wsPort: number, httpServer: Server) {

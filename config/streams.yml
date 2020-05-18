@@ -1,27 +1,27 @@
-server: 
+server:
   port: 8090
 cameras:
-- name: camera1
-  stream: rtsp://91.191.213.49:554/live_mpeg4.sdp
-  wsPort: 8081
-  protocol: tcp
-  fps: 25
-  bitrate: 5000k
-- name: camera2
-  stream: rtsp://195.46.114.132/live/ch00_0
-  wsPort: 8082
-  protocol: tcp
-  fps: 20
-- name: camera3
-  stream: rtsp://98.163.61.242/live/ch00_0
-  wsPort: 8083
-  protocol: tcp
-  fps: 20
-- name: camera4
-  stream: rtsp://87.243.176.50/live/ch00_0
-  wsPort: 8084
-  protocol: tcp
-  fps: 30
-
-#rtsp://75.147.239.197/live/ch00_0 
+  - name: camera1
+    stream: rtsp://91.191.213.49:554/live_mpeg4.sdp
+    wsPort: 8081
+    protocol: tcp
+    fps: 25
+    bitrate: 5000k
+  - name: camera2
+    stream: rtsp://195.46.114.132/live/ch00_0
+    wsPort: 8082
+    protocol: tcp
+    fps: 20
+  - name: camera3
+    stream: rtsp://98.163.61.242/live/ch00_0
+    wsPort: 8083
+    protocol: tcp
+    fps: 20
+  - name: camera4
+    stream: rtsp://87.243.176.50/live/ch00_0
+    wsPort: 8084
+    protocol: tcp
+    fps: 30
+    
+#rtsp://75.147.239.197/live/ch00_0
 #https://gist.github.com/random-robbie/97f025c19a67a89dc94d9bb9a05fbbd9

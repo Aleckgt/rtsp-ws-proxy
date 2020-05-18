@@ -3,9 +3,10 @@ import { safeLoad, YAMLException } from 'js-yaml';
 import * as logger from './logger';
 
 class Settings {
-    data: any;
+    private data: any = {};
+    static instance: Settings = new Settings();
 
-    constructor() {
+    private constructor() {
         let buffer: string = '';
         try {
             buffer = readFileSync('/etc/rtsp-ws-proxy/streams.yml', 'utf8');
@@ -15,17 +16,24 @@ class Settings {
             } catch (e) {
                 try {
                     buffer = readFileSync(process.argv[2], 'utf8');
-                    this.data = safeLoad(buffer);
                 } catch (e) {
-                    if (e instanceof YAMLException) {
-                        logger.error(`Parse error of \"streams.yml\":\n ${e.message}`);
-                    } else {
-                        logger.error('Not found \"streams.yaml\"');
-                    }
+                    logger.error('Not found \"streams.yaml\"');
                     process.exit(1);
                 }
             }
         }
+        try {
+            this.data = safeLoad(buffer);
+            if (!(this.data && this.data.server && this.data.cameras && this.data.cameras.length !== 0)) {
+                throw new YAMLException();
+            }
+        } catch (e) {
+            logger.error(`Error parcing \"streams.yml\":\n ${e.message}`);
+        }
+    }
+
+    static getInstance() {
+        return this.instance ? this.instance : new Settings();
     }
 
     serverPort() {
@@ -37,4 +45,5 @@ class Settings {
     }
 }
 
-export default Settings;
+
+export default Settings.getInstance();

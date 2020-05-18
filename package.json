@@ -20,8 +20,7 @@
     "ws": "7.3.0"
   },
   "devDependencies": {
-    "@types/js-yaml": "3.12.3",
-    "@types/log4js": "2.3.5",
+    "@types/js-yaml": "3.12.4",
     "@types/node": "14.0.1",
     "@types/ws": "7.2.4",
     "pkg": "4.4.8",
@@ -31,14 +30,16 @@
   },
   "pkg": {
     "scripts": "build/*.js",
-    "targets": ["node14-linux-x64"]
+    "targets": [
+      "node14-linux-x64"
+    ]
   },
   "scripts": {
     "lint": "tslint src/**/*.ts --fix",
     "build": "rm -r ./build/** && tsc --declaration",
     "start": "node build/rtsp-ws-proxy.js config/streams.yml",
     "test": "echo 'Error: no test specified' && exit 0",
-    "dist": "rm -rf ./dist/rtsp-ws-proxy && pkg . --output ./dist/rtsp-ws-proxy --debug",
+    "dist": "rm -rf ./dist/** && pkg . --output ./dist/rtsp-ws-proxy --debug",
     "check": "tslint -p tsconfig.json"
   }
 }
