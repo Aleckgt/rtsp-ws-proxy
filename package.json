@@ -36,10 +36,11 @@
   },
   "scripts": {
     "lint": "tslint src/**/*.ts --fix",
-    "build": "rm -r ./build/** && tsc --declaration",
+    "build": "mkdir -p build && touch build/file && rm -r ./build/** && tsc --declaration",
     "start": "node build/rtsp-ws-proxy.js config/streams.yml",
     "test": "echo 'Error: no test specified' && exit 0",
     "dist": "rm -rf ./dist/** && pkg . --output ./dist/rtsp-ws-proxy --debug",
+    "docker": "docker build -t rtsp-ws-proxy .",
     "check": "tslint -p tsconfig.json"
   }
 }
