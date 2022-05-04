@@ -29,29 +29,34 @@ export const startProcess = (serverPort: number, camera: any) => {
         stdio: 'ignore'
     });
 
-    logger.info(`[${ffmpeg.pid}] ${ffmpeg.spawnargs[argNum]}`);
-    processes.set(ffmpeg.pid, ffmpeg);
+    if (ffmpeg && ffmpeg.pid) {
+        const ffmpegPid: number = ffmpeg.pid;
+        logger.info(`[${ffmpeg.pid}] ${ffmpeg.spawnargs[argNum]}`);
+        processes.set(ffmpeg.pid, ffmpeg);
 
-    ffmpeg.on('exit', code => {
-        processes.delete(ffmpeg.pid);
-        if (code === 0) {
-            logger.info(`ffmpeg [${ffmpeg.pid}] exit with code: ${code}. Restarting ffmpeg.`);
-            setTimeout(() => startProcess(serverPort, camera), 1000);
-        } else {
-            logger.error(`ffmpeg [${ffmpeg.pid}] exit with code: ${code}`);
+        ffmpeg.on('exit', code => {
+            processes.delete(ffmpegPid);
+            if (code === 0) {
+                logger.info(`ffmpeg [${ffmpeg.pid}] exit with code: ${code}. Restarting ffmpeg.`);
+                setTimeout(() => startProcess(serverPort, camera), 1000);
+            } else {
+                logger.error(`ffmpeg [${ffmpeg.pid}] exit with code: ${code}`);
+                errorAction();
+            }
+        });
+
+        ffmpeg.on('error', err => {
+            logger.error(err.stack);
             errorAction();
-        }
-    });
+        });
 
-    ffmpeg.on('error', err => {
-        logger.error(err.stack);
-        errorAction();
-    });
-
-    const errorAction = () => {
-        ffmpeg.kill();
-        processes.delete(ffmpeg.pid);
-        logger.warn('Restarting ffmpeg');
-        setTimeout(() => startProcess(serverPort, camera), 3000);
-    };
+        const errorAction = () => {
+            ffmpeg.kill();
+            processes.delete(ffmpegPid);
+            logger.warn('Restarting ffmpeg');
+            setTimeout(() => startProcess(serverPort, camera), 3000);
+        };
+    } else {
+        logger.error('Error starting ffmpeg');
+    }
 };

@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { safeLoad, YAMLException } from 'js-yaml';
+import { load, YAMLException } from 'js-yaml';
 import * as logger from './logger';
 
 class Settings {
@@ -7,7 +7,7 @@ class Settings {
     static instance: Settings = new Settings();
 
     private constructor() {
-        let buffer: string = '';
+        let buffer: string;
         try {
             buffer = readFileSync('/etc/rtsp-ws-proxy/streams.yml', 'utf8');
         } catch (e) {
@@ -23,11 +23,11 @@ class Settings {
             }
         }
         try {
-            this.data = safeLoad(buffer);
+            this.data = load(buffer);
             if (!(this.data && this.data.server && this.data.cameras && this.data.cameras.length !== 0)) {
                 throw new YAMLException();
             }
-        } catch (e) {
+        } catch (e:any) {
             logger.error(`Error parcing \"streams.yml\":\n ${e.message}`);
         }
     }

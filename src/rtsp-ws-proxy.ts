@@ -31,7 +31,7 @@ Settings.cameras().forEach((it: any) => {
 });
 
 function createWsServer(wsPort: number, httpServer: Server) {
-    const wsServer = new WebSocket.Server({ port: wsPort, server: httpServer });
+    const wsServer = new WebSocket.Server({server: httpServer });
     wsServers.set(wsPort, wsServer);
     let connectionCount: number = 0;
     wsServer.on('connection', (socket: Socket, req: any) => {
