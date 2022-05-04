@@ -1,13 +1,12 @@
-FROM node:15.9.0-alpine3.13
+FROM node:lts-alpine3.15
 
-WORKDIR /rtsp-ws-proxy
+COPY . /opt/build
 
-COPY package.json package.json
-COPY tsconfig.json tsconfig.json
-COPY src src
-COPY config config
+RUN cd /opt/build && yarn install && yarn build
+RUN mkdir /opt/rtsp-ws-proxy \
+    && cp /opt/build/build/* /opt/rtsp-ws-proxy \
+    && cp -R /opt/build/config /opt/rtsp-ws-proxy \
+    && cp -R /opt/build/node_modules /opt/rtsp-ws-proxy
+RUN rm -rf /opt/build
 
-RUN npm i
-RUN npm run-script build
-
-CMD ["node", "build/rtsp-ws-proxy.js", "config/streams.yml"]
+CMD ["node", "/opt/rtsp-ws-proxy/rtsp-ws-proxy.js",  "/opt/rtsp-ws-proxy/config/streams.yml"]
