@@ -1,7 +1,7 @@
 const messageType = {
     info: {
         text: 'INFO',
-        color: '\x1b[37m'
+        color: '\x1b[0m'
     },
     warn: {
         text: 'WARNING',
@@ -14,7 +14,7 @@ const messageType = {
 }
 
 const logger = ( type: any, message?: string) => {
-    console.log(type.color, `[${new Date().toLocaleString('ru-RU').replace(',', '')}] [${type.text}]:\t ${message}`)
+    console.log(type.color ? type.color : '', `[${new Date().toLocaleString('ru-RU').replace(',', '')}] [${type.text}]:\t ${message}`)
 }
 
 export const info = (message?: string) => {
