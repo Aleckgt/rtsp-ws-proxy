@@ -1,13 +1,30 @@
-const date = `[${new Date().toLocaleString().replace(',', '')}]`;
+const messageType = {
+    info: {
+        text: 'INFO',
+        color: '\x1b[37m'
+    },
+    warn: {
+        text: 'WARNING',
+        color: '\x1b[33m'
+    },
+    error: {
+        text: 'ERROR',
+        color: '\x1b[31m'
+    }
+}
 
-export function info(message?: string) {
-    console.log(`${date} [INFO]:\t ${message}`);
+const logger = ( type: any, message?: string) => {
+    console.log(type.color, `[${new Date().toLocaleString('ru-RU').replace(',', '')}] [${type.text}]:\t ${message}`)
+}
+
+export const info = (message?: string) => {
+    logger(messageType.info, message);
 }
 
 export function error(message?: string) {
-    console.log(`${date} [ERROR]:\t ${message}`);
+    logger(messageType.error, message);
 }
 
 export function warn(message?: string) {
-    console.log(`${date} [WARNING]:\t ${message}`);
+    logger(messageType.warn, message);
 }

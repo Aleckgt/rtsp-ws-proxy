@@ -26,22 +26,30 @@ export const startProcess = (serverPort: number, camera: any) => {
     ], {
         shell: true,
         detached: true,
-        stdio: 'ignore'
+        stdio: 'pipe'
     });
 
     if (ffmpeg && ffmpeg.pid) {
         const ffmpegPid: number = ffmpeg.pid;
-        logger.info(`[${ffmpeg.pid}] ${ffmpeg.spawnargs[argNum]}`);
-        processes.set(ffmpeg.pid, ffmpeg);
+        logger.info(`[${ffmpegPid}] ${ffmpeg.spawnargs[argNum]}`);
+        processes.set(ffmpegPid, ffmpeg);
 
         ffmpeg.on('exit', code => {
             processes.delete(ffmpegPid);
-            if (code === 0) {
-                logger.info(`ffmpeg [${ffmpeg.pid}] exit with code: ${code}. Restarting ffmpeg.`);
-                setTimeout(() => startProcess(serverPort, camera), 1000);
-            } else {
-                logger.error(`ffmpeg [${ffmpeg.pid}] exit with code: ${code}`);
-                errorAction();
+            switch (code) {
+                case 0: {
+                    logger.info(`[${ffmpegPid}] ffmpeg exit with code: ${code}. Restarting ffmpeg...`);
+                    setTimeout(() => startProcess(serverPort, camera), 1000);
+                    break;
+                };
+                case 127: {
+                    logger.error('ffmpeg not found');
+                    process.exit(1);
+                }
+                default: {
+                    logger.error(`[${ffmpeg.pid}] ffmpeg exit with code: ${code}`);
+                    errorAction();
+                }
             }
         });
 
@@ -50,13 +58,17 @@ export const startProcess = (serverPort: number, camera: any) => {
             errorAction();
         });
 
+        ffmpeg.stdout.on('data', (data) => {
+            logger.info(`Received chunk ${data}`);
+          });
+
         const errorAction = () => {
             ffmpeg.kill();
             processes.delete(ffmpegPid);
-            logger.warn('Restarting ffmpeg');
+            logger.warn('Restarting ffmpeg...');
             setTimeout(() => startProcess(serverPort, camera), 3000);
         };
     } else {
-        logger.error('Error starting ffmpeg');
+        logger.error('Error creating ffmpeg');
     }
 };
